@@ -2,6 +2,7 @@ package thistle.runner;
 
 import org.junit.runner.RunWith;
 import thistle.Describe;
+import thistle.Finally;
 import thistle.Then;
 import thistle.When;
 
@@ -26,7 +27,6 @@ public class ThistleRunnerTest {
     @Then("fail causes error")
     public void t2() {
         System.out.println(3);
-        fail();
     }
 
     @Describe("Also inner specification")
@@ -58,5 +58,15 @@ public class ThistleRunnerTest {
                 System.out.println(8);
             }
         }
+
+        @Finally("close first inner")
+        public void f1() {
+            System.out.println(9);
+        }
+    }
+
+    @Finally("close everything")
+    public void f1() {
+        System.out.println(10);
     }
 }

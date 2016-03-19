@@ -5,6 +5,7 @@ import org.junit.Test;
 import thistle.core.*;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -13,6 +14,8 @@ import static org.mockito.Mockito.mock;
 import static thistle.core.FinallyBlock.finallyBlock;
 import static thistle.core.ThenBlock.thenBlock;
 import static thistle.core.WhenBlock.whenBlock;
+import static java.util.Arrays.asList;
+import static thistle.suite.TestDescription.testDescription;
 
 public class SpecificationUnwrapperTest {
     Block exec1 = mock(Block.class),
@@ -66,8 +69,8 @@ public class SpecificationUnwrapperTest {
     public void shouldProcessSimpleSpecificationAsExpected() {
         List<TestCase> actual = testee.unwrap(simpleSpecification);
         List<TestCase> expected = Arrays.asList(
-                testCase("TestDescription 1 when Premise 1 and Premise 2 then Do 1", Block.NOP, premise1, premise2, case1),
-                testCase("TestDescription 1 when Premise 1 and Premise 2 then Do 2", Block.NOP, premise1, premise2, case2)
+                testCase(testDescription(asList("TestDescription 1"),asList("Premise 1", "Premise 2"), "Do 1", Collections.<String>emptyList()), Block.NOP, premise1, premise2, case1),
+                testCase(testDescription(asList("TestDescription 1"),asList("Premise 1", "Premise 2"), "Do 2", Collections.<String>emptyList()), Block.NOP, premise1, premise2, case2)
         );
         verifyTestCases(actual, expected);
     }
@@ -75,10 +78,9 @@ public class SpecificationUnwrapperTest {
     @Test
     public void shouldProcessSingleNestedSpecificationAsExpected() {
         List<TestCase> actual = testee.unwrap(nestedSpecification);
-        List<TestCase> expected = Arrays.asList(
-                testCase("TestDescription 2 when Premise 1 then Do 2. Finally Close 1 and Close 2", exec1, premise1, case2, finally1, finally2),
-                testCase("TestDescription 2 when Premise 1 then, TestDescription 1 when Premise 1 and Premise 2 then Do 1. Finally Close 1 and Close 2", exec1, premise1, Block.NOP, premise1, premise2, case1, finally1, finally2),
-                testCase("TestDescription 2 when Premise 1 then, TestDescription 1 when Premise 1 and Premise 2 then Do 2. Finally Close 1 and Close 2", exec1, premise1, Block.NOP, premise1, premise2, case2, finally1, finally2)
+        List<TestCase> expected = Arrays.asList( testCase(testDescription(asList("TestDescription 2"),asList("Premise 1"), "Do 2", asList("Close 1", "Close 2")), exec1, premise1, case2, finally1, finally2),
+                testCase(testDescription(asList("TestDescription 2", "TestDescription 1"),asList("Premise 1", "Premise 1", "Premise 2"), "Do 1", asList("Close 1", "Close 2")), exec1, premise1, Block.NOP, premise1, premise2, case1, finally1, finally2),
+                testCase(testDescription(asList("TestDescription 2", "TestDescription 1"),asList("Premise 1", "Premise 1", "Premise 2"), "Do 2", asList("Close 1", "Close 2")), exec1, premise1, Block.NOP, premise1, premise2, case2, finally1, finally2)
         );
         verifyTestCases(actual, expected);
     }
@@ -87,12 +89,12 @@ public class SpecificationUnwrapperTest {
     public void shouldProcessDoubleNestedSpecificationAsExpected() {
         List<TestCase> actual = testee.unwrap(doublyNestedSpecification);
         List<TestCase> expected = Arrays.asList(
-                testCase("TestDescription 3 when Premise 2 then Do 1", exec2, premise2, case1),
-                testCase("TestDescription 3 when Premise 2 then, TestDescription 2 when Premise 1 then Do 2. Finally Close 1 and Close 2", exec2, premise2, exec1, premise1, case2, finally1, finally2),
-                testCase("TestDescription 3 when Premise 2 then, TestDescription 2 when Premise 1 then, TestDescription 1 when Premise 1 and Premise 2 then Do 1. Finally Close 1 and Close 2", exec2, premise2, exec1, premise1, Block.NOP, premise1, premise2, case1, finally1, finally2),
-                testCase("TestDescription 3 when Premise 2 then, TestDescription 2 when Premise 1 then, TestDescription 1 when Premise 1 and Premise 2 then Do 2. Finally Close 1 and Close 2", exec2, premise2, exec1, premise1, Block.NOP, premise1, premise2, case2, finally1, finally2),
-                testCase("TestDescription 3 when Premise 2 then, TestDescription 1 when Premise 1 and Premise 2 then Do 1", exec2, premise2, Block.NOP, premise1, premise2, case1),
-                testCase("TestDescription 3 when Premise 2 then, TestDescription 1 when Premise 1 and Premise 2 then Do 2", exec2, premise2, Block.NOP, premise1, premise2, case2)
+                testCase(testDescription(asList("TestDescription 3"),asList("Premise 2"), "Do 1", Collections.<String>emptyList()), exec2, premise2, case1),
+                testCase(testDescription(asList("TestDescription 3", "TestDescription 2"),asList("Premise 2", "Premise 1"), "Do 2", asList("Close 1", "Close 2")), exec2, premise2, exec1, premise1, case2, finally1, finally2),
+                testCase(testDescription(asList("TestDescription 3", "TestDescription 2", "TestDescription 1"),asList("Premise 2", "Premise 1", "Premise 1", "Premise 2"), "Do 1", asList("Close 1", "Close 2")), exec2, premise2, exec1, premise1, Block.NOP, premise1, premise2, case1, finally1, finally2),
+                testCase(testDescription(asList("TestDescription 3", "TestDescription 2", "TestDescription 1"),asList("Premise 2", "Premise 1", "Premise 1", "Premise 2"), "Do 2", asList("Close 1", "Close 2")), exec2, premise2, exec1, premise1, Block.NOP, premise1, premise2, case2, finally1, finally2),
+                testCase(testDescription(asList("TestDescription 3", "TestDescription 1"),asList("Premise 2", "Premise 1", "Premise 2"), "Do 1", Collections.<String>emptyList()), exec2, premise2, Block.NOP, premise1, premise2, case1),
+                testCase(testDescription(asList("TestDescription 3", "TestDescription 1"),asList("Premise 2", "Premise 1", "Premise 2"), "Do 2", Collections.<String>emptyList()), exec2, premise2, Block.NOP, premise1, premise2, case2)
         );
         verifyTestCases(actual, expected);
     }
@@ -101,7 +103,10 @@ public class SpecificationUnwrapperTest {
         assertThat(actual.size(), equalTo(expected.size()));
         for (int i = 0; i < actual.size(); i++) {
             TestCase actualTestCase = actual.get(i), expectedTestCase = expected.get(i);
-            assertThat(actualTestCase.testName, equalTo(expectedTestCase.testName));
+            assertThat(actualTestCase.testDescription.descriptions, equalTo(expectedTestCase.testDescription.descriptions));
+            assertThat(actualTestCase.testDescription.conditions, equalTo(expectedTestCase.testDescription.conditions));
+            assertThat(actualTestCase.testDescription.testCase, equalTo(expectedTestCase.testDescription.testCase));
+            assertThat(actualTestCase.testDescription.after, equalTo(expectedTestCase.testDescription.after));
             assertThat(actualTestCase.testExecution.sequence.size(), equalTo(expectedTestCase.testExecution.sequence.size()));
             for (int j = 0; j < actualTestCase.testExecution.sequence.size(); j++) {
                 Block actualBlock = actualTestCase.testExecution.sequence.get(j),
@@ -111,7 +116,7 @@ public class SpecificationUnwrapperTest {
         }
     }
 
-    private static TestCase testCase(String descriptor, Block... expectedSequence) {
+    private static TestCase testCase(TestDescription descriptor, Block... expectedSequence) {
         return new TestCase(descriptor, new BlockSequence(Arrays.asList(expectedSequence)));
     }
 }

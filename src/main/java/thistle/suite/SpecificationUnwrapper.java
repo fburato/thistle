@@ -14,21 +14,18 @@ import static thistle.suite.TestCase.testCase;
 
 public class SpecificationUnwrapper {
 
-    private final static Joiner AND_JOINER = Joiner.on(" and ");
-    private final static String WHEN = " when ";
-    private final static String THEN = " then ";
-    private final static String THEN_SUBTEST = " then, ";
-
     public List<TestCase> unwrap(Specification specification) {
         List<TestCase> result = new ArrayList<TestCase>();
+        List<String> conditions = Lists.transform(specification.premises, this.<WhenBlock>getDescription());
+        List<String> after = Lists.transform(specification.finallyDo, this.<FinallyBlock>getDescription());
         for (ThenBlock thenBlock : specification.cases) {
             List<Block> blockSequence = new ArrayList<Block>();
-            String description = specification.description + WHEN + getDescriptions(specification.premises) + THEN + thenBlock.describe() + finallyDescription(specification.finallyDo);
+            final TestDescription testDescription = TestDescription.testDescription(ImmutableList.of(specification.describe()),conditions,thenBlock.describe(),after);
             blockSequence.add(specification.initialisation);
             blockSequence.addAll(specification.premises);
             blockSequence.add(thenBlock);
             blockSequence.addAll(specification.finallyDo);
-            result.add(testCase(description, new BlockSequence(blockSequence)));
+            result.add(testCase(testDescription, new BlockSequence(blockSequence)));
 
         }
 
@@ -38,24 +35,13 @@ public class SpecificationUnwrapper {
                 BlockSequence initialisation = new BlockSequence(Collections.singletonList(specification.initialisation));
                 BlockSequence premises = new BlockSequence(specification.premises);
                 BlockSequence finallyDo = new BlockSequence(specification.finallyDo);
-                String description = specification.description + WHEN + getDescriptions(specification.premises) + THEN_SUBTEST + subTest.testName + finallyDescription(specification.finallyDo);
-                result.add(testCase(description, initialisation.catenate(premises).catenate(subTest.testExecution).catenate(finallyDo)));
+                List<String> subDescription = ImmutableList.<String>builder().add(specification.describe()).addAll(subTest.testDescription.descriptions).build();
+                List<String> subConditions = ImmutableList.<String>builder().addAll(conditions).addAll(subTest.testDescription.conditions).build();
+                List<String> subAfter = ImmutableList.<String>builder().addAll(subTest.testDescription.after).addAll(after).build();
+                result.add(testCase(TestDescription.testDescription(subDescription,subConditions,subTest.testDescription.testCase,subAfter), initialisation.catenate(premises).catenate(subTest.testExecution).catenate(finallyDo)));
             }
         }
         return result;
-    }
-
-    private String finallyDescription(ImmutableList<FinallyBlock> finallyDo) {
-        if (finallyDo.isEmpty()) {
-            return "";
-        } else {
-            return ". Finally " + getDescriptions(finallyDo);
-        }
-    }
-
-    private <T extends DescribableBlock> String getDescriptions(ImmutableList<T> premises) {
-        final List<String> premisesDescription = Lists.transform(premises, getDescription());
-        return AND_JOINER.join(premisesDescription);
     }
 
     private <T extends DescribableBlock> Function<T, String> getDescription() {

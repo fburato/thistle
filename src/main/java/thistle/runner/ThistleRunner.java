@@ -15,6 +15,7 @@ public class ThistleRunner extends ParentRunner<TestCase> {
 
     private static final SpecificationUnwrapper specificationUnwrapper = new SpecificationUnwrapper();
     private static final ReflectiveSpecification reflectiveSpecification = new ReflectiveSpecification(specificationUnwrapper);
+    private static final TestDescriptionProcessor testDescriptionProcessor = new TestDescriptionProcessor();
     private List<TestCase> testCases;
 
     public ThistleRunner(Class<?> testClass) throws InitializationError {
@@ -33,7 +34,7 @@ public class ThistleRunner extends ParentRunner<TestCase> {
 
     @Override
     protected Description describeChild(TestCase child) {
-        return Description.createSuiteDescription(child.testName);
+        return Description.createTestDescription(this.getTestClass().getJavaClass(), testDescriptionProcessor.getDescription(child.testDescription));
     }
 
     @Override
