@@ -8,9 +8,8 @@ import java.util.List;
 
 public class BlockSequence extends Statement implements Block {
 
-    public final ImmutableList<? extends Block> sequence;
-
     public static final BlockSequence EMPTY_SEQUENCE = new BlockSequence(Collections.<Block>emptyList());
+    public final ImmutableList<? extends Block> sequence;
 
     public BlockSequence(List<? extends Block> premises) {
         this.sequence = ImmutableList.<Block>builder().addAll(premises).build();

@@ -18,7 +18,7 @@ public class TestDescriptionProcessor {
     }
 
     private String getDescriptions(ImmutableList<String> descriptions) {
-        return notEmptyJoiner(descriptions,", ","", ": ");
+        return notEmptyJoiner(descriptions, ", ", "", ": ");
     }
 
     private String getConditions(ImmutableList<String> conditions) {
@@ -31,7 +31,7 @@ public class TestDescriptionProcessor {
 
     private String notEmptyJoiner(ImmutableList<String> list, String joiningSequence, String head, String tail) {
         List<String> notEmpty = getNotEmpty(list);
-        if(notEmpty.isEmpty()) {
+        if (notEmpty.isEmpty()) {
             return "";
         } else {
             return head + Joiner.on(joiningSequence).join(notEmpty) + tail;
@@ -40,8 +40,8 @@ public class TestDescriptionProcessor {
 
     private List<String> getNotEmpty(ImmutableList<String> list) {
         List<String> result = new ArrayList<String>();
-        for(String s : list) {
-            if(!Strings.isNullOrEmpty(s)){
+        for (String s : list) {
+            if (!Strings.isNullOrEmpty(s)) {
                 result.add(s);
             }
         }

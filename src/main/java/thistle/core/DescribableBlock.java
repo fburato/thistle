@@ -1,7 +1,5 @@
 package thistle.core;
 
-import com.google.common.base.Objects;
-
 public class DescribableBlock implements Block, Describable {
     public final String condition;
     public final Block block;

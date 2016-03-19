@@ -16,14 +16,19 @@ public class Specification implements Describable {
     private final List<Specification> subSpecifications = new ArrayList<Specification>();
 
     private Specification(Builder builder) {
-        this(builder.description,builder.initialisation,builder.premises,builder.cases,builder.finallyDo);
+        this(builder.description, builder.initialisation, builder.premises, builder.cases, builder.finallyDo);
     }
+
     private Specification(String description, Block initialisation, List<WhenBlock> premises, List<ThenBlock> cases, List<FinallyBlock> finallyDo) {
         this.description = description;
         this.initialisation = initialisation;
         this.premises = ImmutableList.<WhenBlock>builder().addAll(premises).build();
         this.cases = ImmutableList.<ThenBlock>builder().addAll(cases).build();
         this.finallyDo = ImmutableList.<FinallyBlock>builder().addAll(finallyDo).build();
+    }
+
+    public static Builder builder() {
+        return new Builder();
     }
 
     public void addSubSpecification(Specification specification) {
@@ -37,10 +42,6 @@ public class Specification implements Describable {
     @Override
     public String describe() {
         return description;
-    }
-
-    public static Builder builder() {
-        return new Builder();
     }
 
     public static class Builder {

@@ -4,8 +4,6 @@ import org.junit.runner.Description;
 import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.ParentRunner;
 import org.junit.runners.model.InitializationError;
-import org.junit.runners.model.Statement;
-import thistle.Describe;
 import thistle.suite.SpecificationUnwrapper;
 import thistle.suite.TestCase;
 
@@ -20,7 +18,7 @@ public class ThistleRunner extends ParentRunner<TestCase> {
 
     public ThistleRunner(Class<?> testClass) throws InitializationError {
         super(testClass);
-        try{
+        try {
             testCases = reflectiveSpecification.parse(testClass);
         } catch (ThistleException e) {
             throw new InitializationError(e.getMessage());

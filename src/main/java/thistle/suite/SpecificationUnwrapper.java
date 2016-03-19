@@ -1,7 +1,6 @@
 package thistle.suite;
 
 import com.google.common.base.Function;
-import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import thistle.core.*;
@@ -20,7 +19,7 @@ public class SpecificationUnwrapper {
         List<String> after = Lists.transform(specification.finallyDo, this.<FinallyBlock>getDescription());
         for (ThenBlock thenBlock : specification.cases) {
             List<Block> blockSequence = new ArrayList<Block>();
-            final TestDescription testDescription = TestDescription.testDescription(ImmutableList.of(specification.describe()),conditions,thenBlock.describe(),after);
+            final TestDescription testDescription = TestDescription.testDescription(ImmutableList.of(specification.describe()), conditions, thenBlock.describe(), after);
             blockSequence.add(specification.initialisation);
             blockSequence.addAll(specification.premises);
             blockSequence.add(thenBlock);
@@ -38,7 +37,7 @@ public class SpecificationUnwrapper {
                 List<String> subDescription = ImmutableList.<String>builder().add(specification.describe()).addAll(subTest.testDescription.descriptions).build();
                 List<String> subConditions = ImmutableList.<String>builder().addAll(conditions).addAll(subTest.testDescription.conditions).build();
                 List<String> subAfter = ImmutableList.<String>builder().addAll(subTest.testDescription.after).addAll(after).build();
-                result.add(testCase(TestDescription.testDescription(subDescription,subConditions,subTest.testDescription.testCase,subAfter), initialisation.catenate(premises).catenate(subTest.testExecution).catenate(finallyDo)));
+                result.add(testCase(TestDescription.testDescription(subDescription, subConditions, subTest.testDescription.testCase, subAfter), initialisation.catenate(premises).catenate(subTest.testExecution).catenate(finallyDo)));
             }
         }
         return result;

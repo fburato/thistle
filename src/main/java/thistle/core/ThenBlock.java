@@ -5,7 +5,7 @@ public class ThenBlock extends DescribableBlock {
         super(condition, block);
     }
 
-    public static ThenBlock thenBlock(String condition, Block block){
+    public static ThenBlock thenBlock(String condition, Block block) {
         return new ThenBlock(condition, block);
     }
 }
