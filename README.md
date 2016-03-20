@@ -199,8 +199,8 @@ The project has not been hosted in a maven repository yet, however if you want t
 3. Run in the project directory ```mvn clean install```
 4. Include thistle in your project adding the dependency:
 ```
-  <dependency>
-     <groupId>thistle</groupId>
+   <dependency>
+     <groupId>com.github.fburato</groupId>
      <artifactId>thistle</artifactId>
      <version>1.0-SNAPSHOT</version>
      <scope>test</scope>
