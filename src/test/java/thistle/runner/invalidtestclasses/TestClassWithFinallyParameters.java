@@ -7,7 +7,7 @@ import thistle.Finally;
 public class TestClassWithFinallyParameters {
 
     @Finally("")
-    public void f1(int i){
+    public void f1(int i) {
 
     }
 }

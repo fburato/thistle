@@ -7,7 +7,7 @@ import thistle.When;
 public class TestClassWithWhenParameters {
 
     @When("")
-    public void w1(String s){
+    public void w1(String s) {
 
     }
 }

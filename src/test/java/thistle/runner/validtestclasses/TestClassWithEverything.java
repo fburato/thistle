@@ -1,6 +1,9 @@
 package thistle.runner.validtestclasses;
 
-import thistle.*;
+import thistle.Describe;
+import thistle.Finally;
+import thistle.Then;
+import thistle.When;
 
 @Describe("TestDescription")
 public class TestClassWithEverything {
@@ -12,6 +15,7 @@ public class TestClassWithEverything {
     public static int then2Called = 0;
     public static int finally1Called = 0;
     public static int finally2Called = 0;
+
     {
         initCalled = when1Called = when2Called = then1Called = then2Called = finally1Called = finally2Called = 0;
         initCalled++;

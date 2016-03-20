@@ -45,7 +45,7 @@ public class SpecificationTest {
 
         assertThat(testee.description, equalTo(""));
         assertThat(testee.initialisation, is(Block.NOP));
-        assertThat(testee.premises.isEmpty(),is(true));
+        assertThat(testee.premises.isEmpty(), is(true));
         assertThat(testee.cases.isEmpty(), is(true));
         assertThat(testee.finallyDo.isEmpty(), is(true));
     }

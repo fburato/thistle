@@ -8,6 +8,7 @@ public class TestClassWithFinally {
 
     public static boolean init = false;
     public static boolean called = false;
+
     {
         init = true;
         called = false;

@@ -6,7 +6,7 @@ import thistle.When;
 @Describe("something")
 public class TestClassWithWhen {
 
-    public static boolean init =false;
+    public static boolean init = false;
     public static boolean whenCalled = false;
 
     {

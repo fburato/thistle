@@ -2,7 +2,9 @@ package thistle.runner;
 
 import org.junit.Test;
 import thistle.runner.invalidtestclasses.*;
-import thistle.runner.validtestclasses.*;
+import thistle.runner.validtestclasses.TestClassWithEverything;
+import thistle.runner.validtestclasses.TestClassWithNestedSpecification;
+import thistle.runner.validtestclasses.TestClassWithTestCase;
 import thistle.suite.SpecificationUnwrapper;
 import thistle.suite.TestCase;
 
@@ -84,6 +86,7 @@ public class ReflectiveSpecificationTest {
         assertThat(TestClassWithNestedSpecification.finallyInternalCalled, equalTo(1));
         assertThat(TestClassWithNestedSpecification.finallyCalled, equalTo(1));
     }
+
     private void executeTestCases(List<TestCase> testCases) throws Exception {
         for (TestCase testCase : testCases) {
             testCase.testExecution.execute();
@@ -97,7 +100,7 @@ public class ReflectiveSpecificationTest {
 
     @Test(expected = ThistleException.class)
     public void shouldThrowThistleExceptionIfDefaultConstructorNotAvailable() {
-       testee.parse(TestClassWithNonEmptyConstructor.class);
+        testee.parse(TestClassWithNonEmptyConstructor.class);
     }
 
     @Test(expected = ThistleException.class)

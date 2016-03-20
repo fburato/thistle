@@ -12,6 +12,7 @@ public class TestClassWithTestCase {
         called = false;
         init = true;
     }
+
     @Then("Method called")
     public void t1() {
         called = true;

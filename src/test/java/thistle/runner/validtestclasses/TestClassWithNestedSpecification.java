@@ -1,6 +1,9 @@
 package thistle.runner.validtestclasses;
 
-import thistle.*;
+import thistle.Describe;
+import thistle.Finally;
+import thistle.Then;
+import thistle.When;
 
 @Describe("Nested class")
 public class TestClassWithNestedSpecification {
@@ -13,6 +16,7 @@ public class TestClassWithNestedSpecification {
     public static int thenInternalCalled = 0;
     public static int finallyInternalCalled = 0;
     public static int finallyCalled = 0;
+
     {
         initCalled = whenCalled = thenCalled = initInternalCalled = whenInternalCalled = thenInternalCalled = finallyInternalCalled = finallyCalled = 0;
         initCalled++;
@@ -26,6 +30,11 @@ public class TestClassWithNestedSpecification {
     @Then("Then")
     public void t1() {
         thenCalled++;
+    }
+
+    @Finally("Finally")
+    public void f1() {
+        finallyCalled++;
     }
 
     @Describe("Internal class")
@@ -48,10 +57,5 @@ public class TestClassWithNestedSpecification {
         public void fInternal() {
             finallyInternalCalled++;
         }
-    }
-
-    @Finally("Finally")
-    public void f1() {
-        finallyCalled++;
     }
 }

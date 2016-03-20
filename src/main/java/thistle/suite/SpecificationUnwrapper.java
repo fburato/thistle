@@ -14,11 +14,11 @@ import static thistle.suite.TestCase.testCase;
 public class SpecificationUnwrapper {
 
     public List<TestCase> unwrap(Specification specification) {
-        List<TestCase> result = new ArrayList<TestCase>();
-        List<String> conditions = Lists.transform(specification.premises, this.<WhenBlock>getDescription());
-        List<String> after = Lists.transform(specification.finallyDo, this.<FinallyBlock>getDescription());
+        final List<TestCase> result = new ArrayList<TestCase>();
+        final List<String> conditions = Lists.transform(specification.premises, this.<WhenBlock>getDescription());
+        final List<String> after = Lists.transform(specification.finallyDo, this.<FinallyBlock>getDescription());
         for (ThenBlock thenBlock : specification.cases) {
-            List<Block> blockSequence = new ArrayList<Block>();
+            final List<Block> blockSequence = new ArrayList<Block>();
             final TestDescription testDescription = TestDescription.testDescription(ImmutableList.of(specification.describe()), conditions, thenBlock.describe(), after);
             blockSequence.add(specification.initialisation);
             blockSequence.addAll(specification.premises);
@@ -29,11 +29,11 @@ public class SpecificationUnwrapper {
         }
 
         for (Specification subSpecification : specification.getSubSpecifications()) {
-            List<TestCase> subSpecificationTestCases = unwrap(subSpecification);
+            final List<TestCase> subSpecificationTestCases = unwrap(subSpecification);
             for (TestCase subTest : subSpecificationTestCases) {
-                BlockSequence initialisation = new BlockSequence(Collections.singletonList(specification.initialisation));
-                BlockSequence premises = new BlockSequence(specification.premises);
-                BlockSequence finallyDo = new BlockSequence(specification.finallyDo);
+                final BlockSequence initialisation = new BlockSequence(Collections.singletonList(specification.initialisation));
+                final BlockSequence premises = new BlockSequence(specification.premises);
+                final BlockSequence finallyDo = new BlockSequence(specification.finallyDo);
                 List<String> subDescription = ImmutableList.<String>builder().add(specification.describe()).addAll(subTest.testDescription.descriptions).build();
                 List<String> subConditions = ImmutableList.<String>builder().addAll(conditions).addAll(subTest.testDescription.conditions).build();
                 List<String> subAfter = ImmutableList.<String>builder().addAll(subTest.testDescription.after).addAll(after).build();

@@ -25,6 +25,9 @@ import static thistle.core.WhenBlock.whenBlock;
 
 public class ReflectiveSpecification {
 
+    private static final String MISSING_DEFAULT_CONSTRUCTOR = "The test class '%s' does not have a default constructor";
+    private static final String NOT_ANNOTATED_WITH_DESCRIBE = "The root test class '%s' is not annotated with Describe";
+    private static final String NEED_PARAMETERLESS_METHOD = "Method '%s' is not parameterless. Then, When and Finally annotation can only be applied to parameterless methods.";
     private final SpecificationUnwrapper specificationUnwrapper;
 
     public ReflectiveSpecification(SpecificationUnwrapper unwrapper) {
@@ -32,7 +35,7 @@ public class ReflectiveSpecification {
     }
 
     public List<TestCase> parse(Class<?> type) {
-        Specification spec = getSpecification(type);
+        final Specification spec = getSpecification(type);
         return specificationUnwrapper.unwrap(spec);
     }
 
@@ -59,7 +62,7 @@ public class ReflectiveSpecification {
                 return ((Describe) annotation).value();
             }
         }
-        throw new ThistleException("The class is not annotated with Describe");
+        throw new ThistleException(String.format(NOT_ANNOTATED_WITH_DESCRIBE, type.getCanonicalName()));
     }
 
     private StateBlock getInitialisationBlockOrThrow(Class<?> type) {
@@ -73,7 +76,7 @@ public class ReflectiveSpecification {
                 }
             };
         } catch (NoSuchMethodException exception) {
-            throw new ThistleException("The test class does not have a default constructor");
+            throw new ThistleException(String.format(MISSING_DEFAULT_CONSTRUCTOR, type.getCanonicalName()));
         }
     }
 
@@ -115,7 +118,7 @@ public class ReflectiveSpecification {
 
     private StateBlock getZeroParameterMethodInvocationClosureOrThrow(final Method method, State state) {
         if (method.getParameterTypes().length != 0) {
-            throw new ThistleException("When method " + method.getName() + " has parameters");
+            throw new ThistleException(String.format(NEED_PARAMETERLESS_METHOD, method.getName()));
         }
         return new StateBlock(state) {
             @Override
@@ -200,7 +203,7 @@ public class ReflectiveSpecification {
                 }
             };
         } catch (NoSuchMethodException exception) {
-            throw new ThistleException("The test class does not have a default constructor");
+            throw new ThistleException(String.format(MISSING_DEFAULT_CONSTRUCTOR, type.getCanonicalName()));
         }
     }
 

@@ -7,7 +7,7 @@ import thistle.Then;
 public class TestClassWithThenParameter {
 
     @Then("")
-    public void t1(Object ... s) {
+    public void t1(Object... s) {
 
     }
 }
