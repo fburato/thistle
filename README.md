@@ -195,8 +195,9 @@ Thistle will parse this test specification and produce the following tests:
 The project has not been hosted in a maven repository yet, however if you want to try thistle out:
 
 1. Download the source code
-2. Run in the project directory ```mvn clean install```
-3. Include thistle in your project adding the dependency:
+2. Download and install [Maven 3](https://maven.apache.org/download.cgi) for your platform
+3. Run in the project directory ```mvn clean install```
+4. Include thistle in your project adding the dependency:
 ```
   <dependency>
      <groupId>thistle</groupId>
