@@ -5,6 +5,15 @@
   <artifactId>thistle</artifactId>
   <version>0.2-SNAPSHOT</version>
   <packaging>jar</packaging>
+  <description>JUnit runner for Jasmine like tests</description>
+  <developers>
+    <developer>
+      <id>fburato</id>
+      <name>Francesco Burato</name>
+      <email>frankburato-github@yahoo.com</email>
+      <url>http://github.com/fburato</url>
+    </developer>
+  </developers>
 
   <name>thistle</name>
   <url>https://github.com/fburato/thistle</url>
