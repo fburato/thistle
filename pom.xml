@@ -3,7 +3,7 @@
 
   <groupId>com.github.fburato</groupId>
   <artifactId>thistle</artifactId>
-  <version>0.2-SNAPSHOT</version>
+  <version>0.2</version>
   <packaging>jar</packaging>
   <description>JUnit runner for Jasmine like tests</description>
   <developers>
