@@ -1,5 +1,5 @@
 # thistle
-Thistle is a JUnit runner designed to allopw developers to make their test more readable and more structured. It does not 
+Thistle is a JUnit runner designed to allow developers to make their test more readable and more structured. It does not 
 enforce a particular specification test style but allows the developer to have the tools to express them in a better way.
 
 A thistle test looks like this:
@@ -192,17 +192,14 @@ Thistle will parse this test specification and produce the following tests:
 - even number tests: When i is an even number, then multiply i by an odd number. Finally i is still even
 
 ## Installation
-The project has not been hosted in a maven repository yet, however if you want to try thistle out:
 
-1. Download the source code
-2. Download and install [Maven 3](https://maven.apache.org/download.cgi) for your platform
-3. Run in the project directory ```mvn clean install```
-4. Include thistle in your project adding the dependency:
+1. Download and install [Maven 3](https://maven.apache.org/download.cgi) for your platform
+2. Add to your pom
 ```
    <dependency>
      <groupId>com.github.fburato</groupId>
      <artifactId>thistle</artifactId>
-     <version>1.0-SNAPSHOT</version>
+     <version>0.2</version>
      <scope>test</scope>
    </dependency>
 ```
