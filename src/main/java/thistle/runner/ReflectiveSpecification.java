@@ -2,13 +2,7 @@ package thistle.runner;
 
 import com.google.common.base.Optional;
 import thistle.Describe;
-import thistle.Finally;
-import thistle.Then;
-import thistle.When;
-import thistle.core.Block;
-import thistle.core.FinallyBlock;
-import thistle.core.ThenBlock;
-import thistle.core.WhenBlock;
+import thistle.core.*;
 import thistle.suite.Specification;
 import thistle.suite.SpecificationUnwrapper;
 import thistle.suite.TestCase;
@@ -18,10 +12,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
-
-import static thistle.core.FinallyBlock.finallyBlock;
-import static thistle.core.ThenBlock.thenBlock;
-import static thistle.core.WhenBlock.whenBlock;
 
 public class ReflectiveSpecification {
 
@@ -40,12 +30,12 @@ public class ReflectiveSpecification {
     }
 
     private Specification getSpecification(Class<?> type) {
-        String description = getDescribedValueOrThrow(type);
-        StateBlock initBlock = getInitialisationBlockOrThrow(type);
-        List<WhenBlock> whenBlocks = getWhenBlocksOrThrow(type, initBlock.state);
-        List<ThenBlock> thenBlocks = getThenBlocksOrThrow(type, initBlock.state);
-        List<FinallyBlock> finallyBlocks = getFinallyBlocksOrThrow(type, initBlock.state);
-        Specification parentSpecification = Specification.builder()
+        final String description = getDescribedValueOrThrow(type);
+        final StateBlock initBlock = getInitialisationBlockOrThrow(type);
+        final List<WhenBlock> whenBlocks = getBlocksOrThrow(type, initBlock.state, WhenBlock.BUILDER, WhenBlock.ANNOTATION_EXTRACTOR);
+        final List<ThenBlock> thenBlocks = getBlocksOrThrow(type, initBlock.state, ThenBlock.BUILDER, ThenBlock.ANNOTATION_EXTRACTOR);
+        final List<FinallyBlock> finallyBlocks = getBlocksOrThrow(type, initBlock.state, FinallyBlock.BUILDER, FinallyBlock.ANNOTATION_EXTRACTOR);
+        final Specification parentSpecification = Specification.builder()
                 .description(description)
                 .initialisation(initBlock)
                 .premises(whenBlocks)
@@ -57,12 +47,21 @@ public class ReflectiveSpecification {
     }
 
     private String getDescribedValueOrThrow(Class<?> type) {
-        for (Annotation annotation : type.getAnnotations()) {
+        final Optional<String> describableValueOrNothing = getDescriptionIfAnnotated(type);
+        if (describableValueOrNothing.isPresent()) {
+            return describableValueOrNothing.get();
+        } else {
+            throw new ThistleException(String.format(NOT_ANNOTATED_WITH_DESCRIBE, type.getCanonicalName()));
+        }
+    }
+
+    private Optional<String> getDescriptionIfAnnotated(Class innerClass) {
+        for (Annotation annotation : innerClass.getAnnotations()) {
             if (annotation instanceof Describe) {
-                return ((Describe) annotation).value();
+                return Optional.of(((Describe) annotation).value());
             }
         }
-        throw new ThistleException(String.format(NOT_ANNOTATED_WITH_DESCRIBE, type.getCanonicalName()));
+        return Optional.absent();
     }
 
     private StateBlock getInitialisationBlockOrThrow(Class<?> type) {
@@ -80,40 +79,26 @@ public class ReflectiveSpecification {
         }
     }
 
-    private List<WhenBlock> getWhenBlocksOrThrow(Class<?> type, final State state) {
-        List<WhenBlock> whenBlocks = new ArrayList<WhenBlock>();
+    private <T> List<T> getBlocksOrThrow(Class<?> type, final State state, DescribableBlockBuilder<T> builder, AnnotationExtractor<T> extractor) {
+        List<T> blocks = new ArrayList<T>();
         for (Method method : type.getMethods()) {
-            Optional<String> whenValue = getWhenMethodDescription(method);
-            if (whenValue.isPresent()) {
-                StateBlock execution = getZeroParameterMethodInvocationClosureOrThrow(method, state);
-                whenBlocks.add(whenBlock(whenValue.get(), execution));
+            Optional<String> annotatedDescription = getMethodAnnotatedDescriptionOrNothing(method, extractor);
+            if (annotatedDescription.isPresent()) {
+                final StateBlock execution = getZeroParameterMethodInvocationClosureOrThrow(method, state);
+                blocks.add(builder.build(annotatedDescription.get(), execution));
             }
         }
-        return whenBlocks;
+        return blocks;
     }
 
-    private List<ThenBlock> getThenBlocksOrThrow(Class<?> type, final State state) {
-        List<ThenBlock> whenBlocks = new ArrayList<ThenBlock>();
-        for (Method method : type.getMethods()) {
-            Optional<String> thenValue = getThenMethodDescription(method);
-            if (thenValue.isPresent()) {
-                StateBlock execution = getZeroParameterMethodInvocationClosureOrThrow(method, state);
-                whenBlocks.add(thenBlock(thenValue.get(), execution));
+    private <T> Optional<String> getMethodAnnotatedDescriptionOrNothing(Method method, AnnotationExtractor<T> extractor) {
+        for (Annotation annotation : method.getAnnotations()) {
+            final Optional<String> valueOrNothing = extractor.extract(annotation);
+            if (valueOrNothing.isPresent()) {
+                return valueOrNothing;
             }
         }
-        return whenBlocks;
-    }
-
-    private List<FinallyBlock> getFinallyBlocksOrThrow(Class<?> type, State state) {
-        List<FinallyBlock> whenBlocks = new ArrayList<FinallyBlock>();
-        for (Method method : type.getMethods()) {
-            Optional<String> thenValue = getFinallyMethodDescription(method);
-            if (thenValue.isPresent()) {
-                StateBlock execution = getZeroParameterMethodInvocationClosureOrThrow(method, state);
-                whenBlocks.add(finallyBlock(thenValue.get(), execution));
-            }
-        }
-        return whenBlocks;
+        return Optional.absent();
     }
 
     private StateBlock getZeroParameterMethodInvocationClosureOrThrow(final Method method, State state) {
@@ -128,33 +113,6 @@ public class ReflectiveSpecification {
         };
     }
 
-    private Optional<String> getWhenMethodDescription(Method method) {
-        for (Annotation annotation : method.getAnnotations()) {
-            if (annotation instanceof When) {
-                return Optional.of(((When) annotation).value());
-            }
-        }
-        return Optional.absent();
-    }
-
-    private Optional<String> getThenMethodDescription(Method method) {
-        for (Annotation annotation : method.getAnnotations()) {
-            if (annotation instanceof Then) {
-                return Optional.of(((Then) annotation).value());
-            }
-        }
-        return Optional.absent();
-    }
-
-    private Optional<String> getFinallyMethodDescription(Method method) {
-        for (Annotation annotation : method.getAnnotations()) {
-            if (annotation instanceof Finally) {
-                return Optional.of(((Finally) annotation).value());
-            }
-        }
-        return Optional.absent();
-    }
-
     private void processSubspecifcations(Class<?> type, Specification parentSpecification, StateBlock initBlock) {
         Class<?>[] declaredInnerClasses = type.getDeclaredClasses();
         for (Class innerClass : declaredInnerClasses) {
@@ -166,21 +124,12 @@ public class ReflectiveSpecification {
         }
     }
 
-    private Optional<String> getDescriptionIfAnnotated(Class innerClass) {
-        for (Annotation annotation : innerClass.getAnnotations()) {
-            if (annotation instanceof Describe) {
-                return Optional.of(((Describe) annotation).value());
-            }
-        }
-        return Optional.absent();
-    }
-
     private Specification getSpecification(Class<?> type, Class<?> superType, String description, StateBlock superInitBlock) {
-        StateBlock initBlock = getInitialisationBlockForSubSpecificationOrThrow(type, superType, superInitBlock);
-        List<WhenBlock> whenBlocks = getWhenBlocksOrThrow(type, initBlock.state);
-        List<ThenBlock> thenBlocks = getThenBlocksOrThrow(type, initBlock.state);
-        List<FinallyBlock> finallyBlocks = getFinallyBlocksOrThrow(type, initBlock.state);
-        Specification parentSpecification = Specification.builder()
+        final StateBlock initBlock = getInitialisationBlockForSubSpecificationOrThrow(type, superType, superInitBlock);
+        final List<WhenBlock> whenBlocks = getBlocksOrThrow(type, initBlock.state, WhenBlock.BUILDER, WhenBlock.ANNOTATION_EXTRACTOR);
+        final List<ThenBlock> thenBlocks = getBlocksOrThrow(type, initBlock.state, ThenBlock.BUILDER, ThenBlock.ANNOTATION_EXTRACTOR);
+        final List<FinallyBlock> finallyBlocks = getBlocksOrThrow(type, initBlock.state, FinallyBlock.BUILDER, FinallyBlock.ANNOTATION_EXTRACTOR);
+        final Specification parentSpecification = Specification.builder()
                 .description(description)
                 .initialisation(initBlock)
                 .premises(whenBlocks)

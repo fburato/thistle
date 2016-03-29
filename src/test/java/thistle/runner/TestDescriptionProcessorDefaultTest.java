@@ -9,9 +9,9 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static thistle.suite.TestDescription.testDescription;
 
-public class TestDescriptionProcessorTest {
+public class TestDescriptionProcessorDefaultTest {
 
-    TestDescriptionProcessor testee = new TestDescriptionProcessor();
+    DefaultTestDescriptionProcessor testee = new DefaultTestDescriptionProcessor();
 
     @Test
     public void shouldFormatCorrectlyWithEmptyDescription() {
